@@ -1,12 +1,17 @@
+from __future__ import print_function
+
+import config
+
 from flask import Flask, request, render_template
 from werkzeug.utils import secure_filename
 import flask
 
 import os.path
 import subprocess
+import sys
 
 shell_cmd = '''
-/bin/mkdir \
+mkdir \
     -p static/{filename}/{z}/{x} && \
 /usr/local/kakadu-7.2/bin/Mac-x86-64-gcc/kdu_buffered_expand \
     -i {filename} \
@@ -19,25 +24,34 @@ shell_cmd = '''
     -extent {tilesize}x{tilesize} \
     static/{filename}/{z}/{x}/{y}.pgm \
     static/{filename}/{z}/{x}/{y}.png && \
-/bin/rm \
+rm \
     -f static/{filename}/{z}/{x}/{y}.pgm
 '''
 
 DEBUG = True
-SECRET_KEY = '29298cfabc017f006fcd5a4f9ea42afbba50b9a6'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+
+app.config.tile_root = config.tile_root
+if not app.config.tile_root:
+    msg = '''
+    You must set a tile root path in config.py before running reptile.
+    This location is where reptile will save the generated tiles and
+    should be readable and writable by the process owner of reptile.
+    '''
+    print(msg, file=sys.stderr)
+    sys.exit(1)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/<filename>/<int:z>/<int:x>/<int:y>.png')
-def tile(filename, z, x, y):
+def tile(filename, z, x, y, root=app.config.tile_root):
     tilesize = 256
     filename = secure_filename(filename)
-    fullpath = './static/%s/%d/%d/%d.png' % (filename, z, x, y)
+    fullpath = '%s/%s/%d/%d/%d.png' % (root, filename, z, x, y)
     if not os.path.exists(fullpath):
         cmd = shell_cmd.format(
                 filename=filename,
