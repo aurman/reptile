@@ -1,14 +1,14 @@
 from __future__ import print_function
 
-import config
-
-from flask import Flask, request, render_template
-from werkzeug.utils import secure_filename
-import flask
-
 import os.path
 import subprocess
 import sys
+
+import flask
+from flask import Flask, request, render_template
+from werkzeug.utils import secure_filename
+
+import config
 
 shell_cmd = '''
 mkdir \
@@ -43,9 +43,11 @@ if not app.config.tile_root:
     print(msg, file=sys.stderr)
     sys.exit(1)
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/<filename>/<int:z>/<int:x>/<int:y>.png')
 def tile(filename, z, x, y, root=app.config.tile_root):
@@ -54,9 +56,9 @@ def tile(filename, z, x, y, root=app.config.tile_root):
     fullpath = '%s/%s/%d/%d/%d.png' % (root, filename, z, x, y)
     if not os.path.exists(fullpath):
         cmd = shell_cmd.format(
-                filename=filename,
-                z=z, x=x, y=y, level=10-z,
-                tile_x=x*tilesize, tile_y=y*tilesize, tilesize=tilesize)
+            filename=filename,
+            z=z, x=x, y=y, level=10-z,
+            tile_x=x*tilesize, tile_y=y*tilesize, tilesize=tilesize)
         subprocess.call(cmd, shell=True)
     return flask.send_file(fullpath, mimetype='image/png')
 
