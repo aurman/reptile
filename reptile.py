@@ -17,7 +17,6 @@ LD_LIBRARY_PATH=/opt/Kakadu/lib /opt/Kakadu/bin/kdu_buffered_expand \
     -i {jp2_filename} \
     -o {tile_filename}/{z}/{x}/{y}.pgm \
     -reduce {level} \
-    -num_threads 2 \
     -int_region \"{{{tile_y},{tile_x}}},{{{tilesize},{tilesize}}}\" \
     2>/dev/null && \
 
@@ -35,8 +34,6 @@ LD_LIBRARY_PATH=/opt/Kakadu/lib/7.2 /opt/Kakadu/bin/7.2/kdu_jp2info \
     -i {jp2_filename} \
     | xmllint --xpath '//width/text() | //height/text()' -
 '''
-
-DEBUG = True
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -91,4 +88,4 @@ def tile(filename, z, x, y):
     return flask.send_file(tile, mimetype='image/png')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

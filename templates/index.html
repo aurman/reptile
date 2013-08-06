@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 <html lang='en'>
   <head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
-    <link rel='stylesheet' href='http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.css'>
-    <!--[if lte IE 8]><link rel='stylesheet' href='http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.ie.css' /><![endif]-->
-    <style>
-      body { padding: 0; margin: 0 }
-      html, body, #map { height: 100%; width: 100% }
-    </style>
     <title>reptile</title>
+    <meta charset='utf-8'>
   </head>
   <body>
-    <div id='map' class='leaflet-container leaflet-fade-anim' tabindex='0'></div>
-    <script src='http://cdn.leafletjs.com/leaflet-0.5.1/leaflet.js'></script>
-    <script src='{{ url_for("static", filename="reptile.js") }}'></script>
+    <p>Welcome to Mars TV</p>
+    <div>
+      <img src='http://i.stack.imgur.com/qDRbv.jpg' width='256'>
+      <h4>Let's get your backside to Mars</h4>
+      <ul>
+      {% for filename, path in sources.iteritems() %}
+        <li><a href='{{ path }}'>{{ filename }}</a></li>
+      {% endfor %}
+      </ul>
+    </div>
   </body>
-</html>
