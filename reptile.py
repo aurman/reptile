@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 import config
 
 tile_shell_cmd = '''
-mkdir -p {tile_filename}/{z}/{x} && \
+mkdir -p {tile_filename}/{z}/{x} ; \
 
 LD_LIBRARY_PATH=/opt/Kakadu/lib /opt/Kakadu/bin/kdu_buffered_expand \
     -i {jp2_filename} \
@@ -24,7 +24,7 @@ convert \
     -background black \
     -extent {tilesize}x{tilesize} \
     {tile_filename}/{z}/{x}/{y}.pgm \
-    {tile_filename}/{z}/{x}/{y}.png && \
+    {tile_filename}/{z}/{x}/{y}.png ; \
 
 rm -f {tile_filename}/{z}/{x}/{y}.pgm
 '''
