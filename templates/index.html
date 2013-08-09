@@ -10,7 +10,7 @@
       <img src='http://i.stack.imgur.com/qDRbv.jpg' width='256'>
       <h4>Let's get your backside to Mars</h4>
       <ul>
-      {% for filename, path in sources.iteritems() %}
+      {% for filename, path in sources %}
         <li><a href='{{ path }}'>{{ filename }}</a></li>
       {% endfor %}
       </ul>
