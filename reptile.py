@@ -34,9 +34,7 @@ convert \
     -background black \
     -extent {tilesize}x{tilesize} \
     {tile_filename}/{z}/{x}/{y}.pgm \
-    {tile_filename}/{z}/{x}/{y}.png ; \
-
-rm -f {tile_filename}/{z}/{x}/{y}.pgm
+    {tile_filename}/{z}/{x}/{y}.png
 '''
 
 dimensions_shell_cmd = '''
@@ -106,7 +104,7 @@ def tile(filename, z, x, y):
             z=z, x=x, y=y, level=10-z,
             tile_x=x*tilesize, tile_y=y*tilesize, tilesize=tilesize)
         if subprocess.call(cmd, shell=True) != 0:
-            return flask.redirect('/static/black.png')
+            tile = app.config.tile_root + '/black.png'
     return flask.send_file(tile, mimetype='image/png')
 
 if __name__ == '__main__':
