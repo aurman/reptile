@@ -89,8 +89,14 @@ def jp2_source(filename):
     cmd = dimensions_shell_cmd.format(jp2_filename=jp2_filename)
     child = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     width, height = child.stdout.readline().split()
+    lat = float(request.args.get('lat', 0))
+    lng = float(request.args.get('lng', 0))
+    z = int(request.args.get('z', 4))
+    emphasis = request.args.get('emphasis', False)
+
     return render_template('single-source-view.html',
-                           filename=filename, width=width, height=height)
+                           filename=filename, width=width, height=height,
+                           lat=lat, lng=lng, z=z, emphasis=emphasis)
 
 
 @app.route('/<path:filename>/<int:z>/<int:x>/<int:y>.png')
