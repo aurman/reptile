@@ -20,7 +20,26 @@ def ignored(*exceptions):
     except exceptions:
         pass
 
-tile_shell_cmd = '''
+rgb_tile_shell_cmd = '''
+mkdir -p {tile_filename}/{z}/{x} ; \
+
+LD_LIBRARY_PATH=/opt/Kakadu/lib /opt/Kakadu/bin/kdu_buffered_expand \
+    -i {jp2_filename} \
+    -o {tile_filename}/{z}/{x}/{y}-red.pgm,{tile_filename}/{z}/{x}/{y}-green.pgm,{tile_filename}/{z}/{x}/{y}-blue.pgm \
+    -reduce {level} \
+    -int_region \"{{{tile_y},{tile_x}}},{{{tilesize},{tilesize}}}\" \
+    2>/dev/null && \
+
+convert \
+     {tile_filename}/{z}/{x}/{y}-red.pgm {tile_filename}/{z}/{x}/{y}-green.pgm {tile_filename}/{z}/{x}/{y}-blue.pgm \
+     -set colorspace RGB \
+     -combine -set colorspace sRGB \
+    -background black \
+    -extent {tilesize}x{tilesize} \
+    {tile_filename}/{z}/{x}/{y}.png
+'''
+
+mono_tile_shell_cmd = '''
 mkdir -p {tile_filename}/{z}/{x} ; \
 
 LD_LIBRARY_PATH=/opt/Kakadu/lib /opt/Kakadu/bin/kdu_buffered_expand \
@@ -93,7 +112,6 @@ def jp2_source(filename):
     lng = float(request.args.get('lng', 0))
     z = int(request.args.get('z', 4))
     emphasis = request.args.get('emphasis', False)
-
     return render_template('single-source-view.html',
                            filename=filename, width=width, height=height,
                            lat=lat, lng=lng, z=z, emphasis=emphasis)
@@ -103,8 +121,13 @@ def jp2_source(filename):
 def tile(filename, z, x, y):
     tilesize = 256
     tile = '%s/%s/%d/%d/%d.png' % (app.config.tile_root, filename, z, x, y)
+    color_formats = ('MRGB', 'COLOR')
+    if any(fmt in filename for fmt in color_formats):
+        shell_cmd = rgb_tile_shell_cmd
+    else:
+        shell_cmd = mono_tile_shell_cmd
     if not os.path.exists(tile):
-        cmd = tile_shell_cmd.format(
+        cmd = shell_cmd.format(
             tile_filename=app.config.tile_root + filename,
             jp2_filename=app.config.jp2_root + filename,
             z=z, x=x, y=y, level=10-z,
